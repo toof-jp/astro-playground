@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+	const posts = await getCollection('posts');
+	return posts.map((post) => ({
+		params: { slug: post.slug },
+		props: { post },
+	}));
+};
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{post.data.title} - Shaggy Star</title>
+	</head>
+	<body>
+		<article>
+			<h1>{post.data.title}</h1>
+			<p><small>Published: {post.data.pubDate.toLocaleDateString()}</small></p>
+			{post.data.tags.length > 0 && (
+				<p><small>Tags: {post.data.tags.join(', ')}</small></p>
+			)}
+			<Content />
+		</article>
+		<p><a href="/posts">← Back to Posts</a></p>
+		<p><a href="/">← Back to Home</a></p>
+	</body>
+</html>
